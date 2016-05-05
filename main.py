@@ -8,7 +8,7 @@ import ttk
 
 # project
 import constants
-
+import shared
 
 class PWMApp(object):
 
@@ -17,7 +17,6 @@ class PWMApp(object):
         self._root = root
         self.root = Tk.Frame(self._root)
         self.root.pack(fill="both", expand="yes")
-        self.master_password = None
 
         self.login_create()
 
@@ -71,7 +70,7 @@ class PWMApp(object):
         print repr(table_password)
         if table_password == 'trustno1' or not table_password:
             print "OK"
-            self.master_password = table_password
+            shared.MASTER_PASSWORD = table_password
             self.login_to_main()
         else:
             print "BAD"
@@ -96,7 +95,7 @@ class PWMApp(object):
 
     def main_to_login(self):
         self.main_frame.pack_forget()
-        self.master_password = None
+        shared.MASTER_PASSWORD = None
         self.login_create()
 
 
