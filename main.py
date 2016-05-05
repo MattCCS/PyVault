@@ -6,13 +6,8 @@ Secure password manager, version 5.
 import Tkinter as Tk
 import ttk
 
-MIN_WIDTH = 480
-MIN_HEIGHT = 360
-
-START_WIDTH = 640
-START_HEIGHT = 480
-
-FILLCELL = Tk.N + Tk.E + Tk.S + Tk.W
+# project
+import constants
 
 
 class PWMApp(object):
@@ -39,14 +34,14 @@ class PWMApp(object):
 
         self._lock = Tk.PhotoImage(file="lock-128.gif")
         _border = 0
-        _canv = Tk.Canvas(self.login_frame, width=128-36, height=128, borderwidth=_border, relief="raised")
+        _canv = Tk.Canvas(self.login_frame, width=128 - 36, height=128, borderwidth=_border, relief="raised")
         _canv.pack()
         _dim = 64 + 3 + _border
-        _canv.create_image(_dim-36/2, _dim, image=self._lock)
+        _canv.create_image(_dim - 36 / 2, _dim, image=self._lock)
 
         _expln = Tk.StringVar()
         _expln.set("The password table is encrypted.\nTo decrypt it, please enter the master password below.")
-        self.table_pw_expln = Tk.Message(self.login_frame, textvariable=_expln, width=MIN_WIDTH-20, justify=Tk.CENTER, pady=20)
+        self.table_pw_expln = Tk.Message(self.login_frame, textvariable=_expln, width=constants.MIN_WIDTH-20, justify=Tk.CENTER, pady=20)
         self.table_pw_expln.pack()
 
         # password entry widgets
@@ -65,7 +60,7 @@ class PWMApp(object):
         # error message
         self.err_var = Tk.StringVar()
         self.err_var.set('')
-        self.err_message = Tk.Message(self.pw_grid, textvariable=self.err_var, width=MIN_WIDTH-20, justify=Tk.CENTER, fg="red")
+        self.err_message = Tk.Message(self.pw_grid, textvariable=self.err_var, width=constants.MIN_WIDTH-20, justify=Tk.CENTER, fg="red")
 
         self.pw_label.grid(row=0, column=0)
         self.pw_entry.grid(row=0, column=1)
@@ -106,8 +101,8 @@ class PWMApp(object):
 
 
 ROOT = Tk.Tk()
-ROOT.minsize(MIN_WIDTH, MIN_HEIGHT)
-ROOT.geometry("{}x{}".format(START_WIDTH, START_HEIGHT))
+ROOT.minsize(constants.MIN_WIDTH, constants.MIN_HEIGHT)
+ROOT.geometry("{}x{}".format(constants.START_WIDTH, constants.START_HEIGHT))
 # ROOT.geometry("480x320")
 # ROOT.lift()
 
