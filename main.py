@@ -4,7 +4,6 @@ Secure password manager, version 5.
 
 # standard
 import Tkinter as Tk
-# import ttk as Tk
 
 # project
 import constants
@@ -31,6 +30,7 @@ def setup():
 
 def run_tkinter():
     """Runs the Tkinter app."""
+    shared.ROOT.wm_title(constants.TITLE)
     shared.ROOT.mainloop()
     try:
         shared.ROOT.destroy()  # optional?
