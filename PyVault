@@ -3,4 +3,4 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd ) # directory of this script
 cd $DIR
 
-python -B main.py &
+python -B main.py

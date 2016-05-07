@@ -9,6 +9,7 @@ import Tkinter as Tk
 
 # project
 import constants
+import copy_paste
 import page
 import shared
 import passwords
@@ -128,10 +129,19 @@ class MainPage(page.AbstractPage):
 
         self.var_radio = Tk.IntVar()
         self.var_radio.set(1)
-        self.label_radio = Tk.Label(self.frame_generator, text="What to do:")
-        self.radio_show = Tk.Radiobutton(self.frame_generator, text="Show", variable=self.var_radio, value=1)
-        self.radio_copy = Tk.Radiobutton(self.frame_generator, text="Copy to clipboard", variable=self.var_radio, value=2)
-        self.button_generate = Tk.Button(self.frame_generator, text="Generate", command=self.generate_password)
+        self.label_buttons = Tk.Label(self.frame_generator, text="What to do:")
+        # self.radio_show = Tk.Radiobutton(self.frame_generator, text="Show", variable=self.var_radio, value=1)
+        # self.radio_copy = Tk.Radiobutton(self.frame_generator, text="Copy to clipboard", variable=self.var_radio, value=2)
+        self.button_preview = Tk.Button(
+            self.frame_generator,
+            text="Preview",
+            command=self.generate_password
+        )
+        self.button_generate_and_copy = Tk.Button(
+            self.frame_generator,
+            text="Generate and copy to clipboard",
+            command=self.generate_and_copy
+        )
 
         # placement
         self.check_uppercase.grid(row=0, column=0, sticky=Tk.W, columnspan=2)
@@ -148,12 +158,13 @@ class MainPage(page.AbstractPage):
 
         self.entry_password.grid(row=4, column=0, columnspan=4, sticky=constants.FILLCELL)
 
-        self.label_radio.grid(row=5, column=0)
-        self.radio_show.grid(row=5, column=1)
-        self.radio_copy.grid(row=5, column=2)
-        self.button_generate.grid(row=5, column=3, sticky=constants.FILLCELL)
+        self.label_buttons.grid(row=5, column=0)
+        # self.radio_show.grid(row=5, column=1)
+        # self.radio_copy.grid(row=5, column=2)
+        self.button_preview.grid(row=5, column=1, sticky=constants.FILLCELL)
+        self.button_generate_and_copy.grid(row=5, column=2, columnspan=2, sticky=constants.FILLCELL)
 
-    def generate_password(self):
+    def generate_password(self, show=True):
         password = os.urandom(10)
         password = base64.b64encode(password)
 
@@ -181,8 +192,14 @@ class MainPage(page.AbstractPage):
 
         password = passwords.generate_password(chars=chars, length=length)
 
-        set_readonly_label(self.entry_password, password)
+        if show:
+            set_readonly_label(self.entry_password, password)
 
+        return password
+
+    def generate_and_copy(self):
+        password = self.generate_password(show=False)
+        copy_paste.write_to_clipboard(password)
 
     def main_to_login(self):
         shared.MASTER_PASSWORD = None
