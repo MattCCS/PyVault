@@ -69,9 +69,6 @@ class LoginPage(page.AbstractPage):
         )
         self.pw_entry.bind("<Return>", lambda k: self.table_pw_enter())
 
-        # attempt reminder
-        # ...
-
         # error message
         self.err_var = Tk.StringVar()
         self.err_var.set('')
@@ -89,13 +86,12 @@ class LoginPage(page.AbstractPage):
 
     def table_pw_enter(self):
         table_password = self.table_pw_var.get()
-        print repr(table_password)
+
+        # TODO: actually do symmetric crypto
         if table_password == 'trustno1' or not table_password:
-            print "OK"
             shared.MASTER_PASSWORD = table_password
             self.login_to_main()
         else:
-            print "BAD"
             self.err_var.set("Master password was incorrect.")
 
     def login_to_main(self):
