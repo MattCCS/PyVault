@@ -8,7 +8,7 @@ import Tkinter as Tk
 # project
 from pykeys import constants
 from pykeys import shared
-from pykeys.pages import add_entry
+from pykeys.pages import add_page
 from pykeys.pages import login_page
 from pykeys.pages import main_page
 
@@ -22,7 +22,7 @@ def setup():
     # create = creation_mage.CreationPage(shared.ROOT)
     login = login_page.LoginPage(shared.ROOT)
     main = main_page.MainPage(shared.ROOT)
-    add = add_entry.AddEntry(shared.ROOT)
+    add = add_page.AddEntry(shared.ROOT)
 
     shared.PAGES[constants.LOGIN] = login
     shared.PAGES[constants.MAIN] = main
