@@ -1,4 +1,0 @@
-
-
----> Use the settings.py file more!  Things like required password length, etc.
-
