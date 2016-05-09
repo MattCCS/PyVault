@@ -8,6 +8,7 @@ import os
 import Tkinter as Tk
 
 # project
+import add_entry
 import constants
 import copy_paste
 import page
@@ -26,7 +27,7 @@ class MainPage(page.AbstractPage):
 
     def start(self):
         """Creates the main window."""
-        self.root.pack(fill="both", expand="yes")
+        self.main.pack(fill="both", expand="yes")
 
     def _setup(self):
         """Sets up this page -- only call once!"""
@@ -39,10 +40,10 @@ class MainPage(page.AbstractPage):
 
         ########################################
         # navigation
-        self.frame_navigation = Tk.Frame(self.root)
+        self.frame_navigation = Tk.Frame(self.main)
         self.frame_navigation.pack(anchor=Tk.W)
 
-        # self.listbox_keys = Tk.Listbox(self.root, relief="ridge", borderwidth=4)
+        # self.listbox_keys = Tk.Listbox(self.main, relief="ridge", borderwidth=4)
         # self.listbox_keys.insert(Tk.END, "test")
         # self.listbox_keys.pack(expand="yes", fill="x")
 
@@ -68,29 +69,30 @@ class MainPage(page.AbstractPage):
 
         ########################################
         # keychain
-        self.frame_database = Tk.Frame(self.root)
+        self.frame_database = Tk.Frame(self.main)
         self.frame_database.pack(anchor=Tk.W, fill="both", expand="yes")
-
-        self.listbox_keys = Tk.Listbox(self.frame_database, relief="ridge", borderwidth=4)
-        self.text_notes = Tk.Text(self.frame_database, width=20, height=10, relief="ridge", borderwidth=4)
-        self.button_add = Tk.Button(self.frame_database, text="Add")
-        self.button_edit = Tk.Button(self.frame_database, text="Edit")
-        self.button_delete = Tk.Button(self.frame_database, text="Delete")
-
-        # notes and buttons
         self.frame_database.columnconfigure(0, weight=1)
         self.frame_database.rowconfigure(0, weight=1)
-        self.listbox_keys.grid(row=0, column=0, columnspan=2, rowspan=4, sticky=constants.FILLCELL)
+
+        # notes and buttons
+        self.listbox_keys = Tk.Listbox(self.frame_database, relief="ridge", borderwidth=4)
+        self.listbox_keys.grid(row=0, column=0, columnspan=2, rowspan=5, sticky=constants.FILLCELL)
+        self.text_notes = Tk.Text(self.frame_database, width=20, height=10, relief="ridge", borderwidth=4)
         self.text_notes.grid(row=0, column=2, sticky=constants.FILLCELL)
-        self.button_add.grid(row=1, column=2, sticky=constants.FILLCELL)
-        self.button_edit.grid(row=2, column=2, sticky=constants.FILLCELL)
-        self.button_delete.grid(row=3, column=2, sticky=constants.FILLCELL)
+        self.button_show = Tk.Button(self.frame_database, text="Show", command=self.main_to_show)
+        self.button_show.grid(row=1, column=2, sticky=constants.FILLCELL)
+        self.button_add = Tk.Button(self.frame_database, text="Add", command=self.main_to_add)
+        self.button_add.grid(row=2, column=2, sticky=constants.FILLCELL)
+        self.button_edit = Tk.Button(self.frame_database, text="Edit", command=self.main_to_edit)
+        self.button_edit.grid(row=3, column=2, sticky=constants.FILLCELL)
+        self.button_delete = Tk.Button(self.frame_database, text="Delete", command=self.main_to_delete)
+        self.button_delete.grid(row=4, column=2, sticky=constants.FILLCELL)
 
     def _setup_generator(self):
 
         ########################################
         # password generator
-        self.frame_generator = Tk.LabelFrame(self.root, text="Password Generator")
+        self.frame_generator = Tk.LabelFrame(self.main, text="Password Generator")
         self.frame_generator.pack(anchor=Tk.CENTER)
 
         self.var_uppercase = Tk.BooleanVar()
@@ -106,7 +108,7 @@ class MainPage(page.AbstractPage):
         self.check_uppercase = Tk.Checkbutton(self.frame_generator, text="uppercase (ABC...)", variable=self.var_uppercase)
         self.check_lowercase = Tk.Checkbutton(self.frame_generator, text="lowercase (abc...)", variable=self.var_lowercase)
         self.check_digits = Tk.Checkbutton(self.frame_generator, text="digits (012...)", variable=self.var_digits)
-        self.check_special = Tk.Checkbutton(self.frame_generator, text="special ([]!@#...)", variable=self.var_special)
+        self.check_special = Tk.Checkbutton(self.frame_generator, text="punctuation ([]!@#...)", variable=self.var_special)
         self.check_custom = Tk.Checkbutton(self.frame_generator, text="custom", variable=self.var_custom)
         self.entry_custom = Tk.Entry(self.frame_generator, width=12)
         self.check_all = Tk.Checkbutton(self.frame_generator, text="*ALL* (overrides others)", variable=self.var_all)
@@ -127,8 +129,8 @@ class MainPage(page.AbstractPage):
         self.entry_password = Tk.Entry(self.frame_generator, width=max_password_length)
         self.entry_password.configure(state="readonly")
 
-        self.var_radio = Tk.IntVar()
-        self.var_radio.set(1)
+        # self.var_radio = Tk.IntVar()
+        # self.var_radio.set(1)
         self.label_buttons = Tk.Label(self.frame_generator, text="What to do:")
         # self.radio_show = Tk.Radiobutton(self.frame_generator, text="Show", variable=self.var_radio, value=1)
         # self.radio_copy = Tk.Radiobutton(self.frame_generator, text="Copy to clipboard", variable=self.var_radio, value=2)
@@ -201,6 +203,20 @@ class MainPage(page.AbstractPage):
         password = self.generate_password(show=False)
         copy_paste.write_to_clipboard(password)
 
+    ########################################
+    # transitions
+
+    def main_to_show(self):
+        pass
+
+    def main_to_add(self):
+        self.transition(constants.ADD)
+
     def main_to_login(self):
-        shared.MASTER_PASSWORD = None
         self.transition(constants.LOGIN)
+
+    def main_to_edit(self):
+        pass
+
+    def main_to_delete(self):
+        pass

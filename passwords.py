@@ -15,11 +15,16 @@ ALL = set(chr(i) for i in xrange(32, 126 + 1))
 
 def password_chars(upper=False, lower=False, digits=False, special=False, custom=None):
     chars = set()
-    if lower: chars |= LOWER
-    if upper: chars |= UPPER
-    if digits: chars |= DIGITS
-    if special: chars |= SPECIAL
-    if custom: chars |= custom
+    if lower:
+        chars |= LOWER
+    if upper:
+        chars |= UPPER
+    if digits:
+        chars |= DIGITS
+    if special:
+        chars |= SPECIAL
+    if custom:
+        chars |= custom
     return chars
 
 def generate_password(chars=ALL, length=10):

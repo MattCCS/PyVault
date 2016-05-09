@@ -17,21 +17,17 @@ class LoginPage(page.AbstractPage):
 
     def start(self):
         """Creates the login window."""
-        self.root.pack(fill="both", expand="yes")
+        self.main.pack(fill="both", expand="yes")
         self.err_var.set('')
         self.pw_entry.delete(0, 'end')  # http://stackoverflow.com/questions/2260235/how-to-clear-the-entry-widget-after-a-button-is-pressed-in-tkinter
 
     def _setup(self):
         """Sets up this page -- only call once!"""
         # make the outermost frame
-        # self.login_frame = Tk.LabelFrame(self.root, text="Secure Password Manager", borderwidth=2)
-        self.login_frame = Tk.Frame(self.root)
-        # self.login_frame.pack(fill="both", expand="yes")
-        # self.login_frame.pack(fill="both")
+        self.login_frame = Tk.Frame(self.main)
         self.login_frame.pack(expand="yes")
-        # self.login_frame.pack()
 
-        self._lock = Tk.PhotoImage(file="lock-128.gif")
+        self._lock = Tk.PhotoImage(file="icons/lock-128.gif")
         _border = 0
         _canv = Tk.Canvas(
             self.login_frame,
@@ -64,7 +60,7 @@ class LoginPage(page.AbstractPage):
         self.table_pw_var = Tk.StringVar()
         self.pw_entry = Tk.Entry(
             self.pw_grid,
-            show="*",
+            show=constants.HIDDEN,
             textvariable=self.table_pw_var
         )
         self.pw_entry.bind("<Return>", lambda k: self.table_pw_enter())

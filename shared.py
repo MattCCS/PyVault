@@ -10,7 +10,7 @@ import Tkinter as Tk
 import constants
 
 # data
-MASTER_PASSWORD = None
+PAGES = {}
 
 # app
 ROOT = Tk.Tk()

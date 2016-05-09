@@ -6,6 +6,7 @@ Secure password manager, version 5.
 import Tkinter as Tk
 
 # project
+import add_entry
 import constants
 import shared
 import login_page
@@ -17,15 +18,14 @@ def setup():
     Crucial function for creating pages and
     allowing inter-page transitions.
     """
-    pages = {}
 
-    login = login_page.LoginPage(pages)
-    main = main_page.MainPage(pages)
+    login = login_page.LoginPage(shared.ROOT)
+    main = main_page.MainPage(shared.ROOT)
+    add = add_entry.AddEntry(shared.ROOT)
 
-    pages[constants.LOGIN] = login
-    pages[constants.MAIN] = main
-
-    return pages
+    shared.PAGES[constants.LOGIN] = login
+    shared.PAGES[constants.MAIN] = main
+    shared.PAGES[constants.ADD] = add
 
 
 def run_tkinter():
@@ -40,8 +40,8 @@ def run_tkinter():
 
 def main():
     """Sets up the app and runs it."""
-    pages = setup()
-    pages[constants.LOGIN].start()
+    setup()
+    shared.PAGES[constants.LOGIN].start()
 
     run_tkinter()
 
