@@ -3,4 +3,5 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd ) # directory of this script
 cd $DIR
 
+. bin/activate
 python -B -m pykeys.main

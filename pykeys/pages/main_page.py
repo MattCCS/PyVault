@@ -96,17 +96,17 @@ class MainPage(page.AbstractPage):
         self.var_uppercase = Tk.BooleanVar()
         self.var_lowercase = Tk.BooleanVar()
         self.var_digits = Tk.BooleanVar()
-        self.var_special = Tk.BooleanVar()
+        self.var_punctuation = Tk.BooleanVar()
         self.var_custom = Tk.BooleanVar()
         self.var_all = Tk.BooleanVar()
         self.var_uppercase.set(True)
         self.var_lowercase.set(True)
         self.var_digits.set(True)
-        self.var_special.set(True)
+        self.var_punctuation.set(True)
         self.check_uppercase = Tk.Checkbutton(self.frame_generator, text="uppercase (ABC...)", variable=self.var_uppercase)
         self.check_lowercase = Tk.Checkbutton(self.frame_generator, text="lowercase (abc...)", variable=self.var_lowercase)
         self.check_digits = Tk.Checkbutton(self.frame_generator, text="digits (012...)", variable=self.var_digits)
-        self.check_special = Tk.Checkbutton(self.frame_generator, text="punctuation ([]!@#...)", variable=self.var_special)
+        self.check_punctuation = Tk.Checkbutton(self.frame_generator, text="punctuation ([]!@#...)", variable=self.var_punctuation)
         self.check_custom = Tk.Checkbutton(self.frame_generator, text="custom", variable=self.var_custom)
         self.entry_custom = Tk.Entry(self.frame_generator, width=12)
         self.check_all = Tk.Checkbutton(self.frame_generator, text="*ALL* (overrides others)", variable=self.var_all)
@@ -148,7 +148,7 @@ class MainPage(page.AbstractPage):
         self.check_lowercase.grid(row=1, column=0, sticky=Tk.W, columnspan=2)
         self.check_digits.grid(row=2, column=0, sticky=Tk.W, columnspan=2)
 
-        self.check_special.grid(row=0, column=1, sticky=Tk.W, columnspan=2)
+        self.check_punctuation.grid(row=0, column=1, sticky=Tk.W, columnspan=2)
         self.check_custom.grid(row=1, column=1, sticky=Tk.W, columnspan=1)
         self.entry_custom.grid(row=1, column=2, columnspan=2, sticky=constants.FILLCELL)
         self.check_all.grid(row=2, column=1, sticky=Tk.W, columnspan=2)
@@ -171,7 +171,7 @@ class MainPage(page.AbstractPage):
         upper = self.var_uppercase.get()
         lower = self.var_lowercase.get()
         digits = self.var_digits.get()
-        special = self.var_special.get()
+        punctuation = self.var_punctuation.get()
         custom = set(self.entry_custom.get()) if self.var_custom.get() else set()
         all_chars = self.var_all.get()
         length = self.var_password_length.get()
@@ -183,7 +183,7 @@ class MainPage(page.AbstractPage):
                 upper=upper,
                 lower=lower,
                 digits=digits,
-                special=special,
+                punctuation=punctuation,
                 custom=custom
             )
 
