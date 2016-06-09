@@ -96,7 +96,7 @@ class DerivedEntry(Entry):
         self.lowercase = passparams['lowercase']
         self.digits = passparams['digits']
         self.punctuation = passparams['punctuation']
-        self.custom = frozenset(passparams['custom'])
+        self.custom = passparams['custom']
         self.all = passparams['all']
 
     def save(self):
@@ -138,7 +138,7 @@ class DerivedEntry(Entry):
                 lower=self.lowercase,
                 digits=self.digits,
                 punctuation=self.punctuation,
-                custom=self.custom,
+                custom=frozenset(self.custom),
             )
 
         return passwords.remap_bytearray(bytearray(key), chars)
