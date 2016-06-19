@@ -15,43 +15,39 @@ from pykeys.crypto import symmetric_encryption_utils
 
 
 
-def encrypt_with_stretching(memkey, data):
+def encrypt_with_stretching(memkey, table):
     # derive master password (with nonce)
-    (master_key, ksd) = key_stretching.stretch(memkey, generic_utils.nonce())
-    (mode, salt, iterations, length) = ksd
+    (master_key, key_data) = key_stretching.stretch(memkey, generic_utils.nonce())
+    (mode, salt, iterations, length) = key_data
 
     # stretch master password
     (master_key_hash, _) = key_stretching.stretch(master_key, salt)
 
     # dump data, encrypt and HMAC
-    ciphertext = symmetric_encryption_utils.encrypt_hmac(master_key, json.dumps(data))
-    p_ciphertext = packing_utils.pack(ciphertext)
+    table_encrypted = symmetric_encryption_utils.encrypt_hmac(master_key, json.dumps(table))
+    p_table_encrypted = packing_utils.pack(table_encrypted)
 
-    keyfile = {
-        'ksd': {
+    db_encrypted = {
+        'key data': {
             'hash': packing_utils.pack(master_key_hash),
             'salt': packing_utils.pack(salt),
             'mode': mode,
             'iterations': iterations,
             'length': length,
         },
-        'db': p_ciphertext,
+        'table': p_table_encrypted,
     }
 
-    # return packing_utils.pack(json.dumps(keyfile))
-    return json.dumps(keyfile)
+    return db_encrypted
 
 
-def decrypt_with_stretching(memkey, p_keyfile):
+def decrypt_with_stretching(memkey, key_data, p_table_encrypted):
     # unpack the data
-    # keyfile = json.loads(packing_utils.unpack(p_keyfile))
-    keyfile = json.loads(p_keyfile)
-    ksd = keyfile['ksd']
-    master_key_hash = packing_utils.unpack(ksd['hash'])
-    salt = packing_utils.unpack(ksd['salt'])
-    mode = ksd['mode']
-    iterations = ksd['iterations']
-    length = ksd['length']
+    master_key_hash = packing_utils.unpack(key_data['hash'])
+    salt = packing_utils.unpack(key_data['salt'])
+    mode = key_data['mode']
+    iterations = key_data['iterations']
+    length = key_data['length']
 
     # derive master password (with nonce)
     (master_key_2, _) = key_stretching.stretch(memkey, salt, mode=mode, iterations=iterations, length=length)
@@ -62,21 +58,26 @@ def decrypt_with_stretching(memkey, p_keyfile):
         raise errors.PasswordHashComparisonError("Master password was incorrect!")
 
     # decrypt the database
-    ciphertext_data = packing_utils.unpack(keyfile['db'])
-    db = json.loads(symmetric_encryption_utils.decrypt_hmac(master_key_2, ciphertext_data))
-
-    keyfile['db'] = db  # overwrite encrypted volume in memory -- not on disk
-
-    return keyfile
+    ciphertext_data = packing_utils.unpack(p_table_encrypted)
+    table = json.loads(symmetric_encryption_utils.decrypt_hmac(master_key_2, ciphertext_data))
+    return table
 
 
-data = {'abc': 123}
-print data
+table_1 = {
+    'abc': 123,
+    'big_data': '''When in the Course of human events, it becomes necessary \
+for one people to dissolve the political bands which have connected them with \
+another, and to assume among the powers of the earth, the separate and equal \
+station to which the Laws of Nature and of Nature's God entitle them, a \
+decent respect to the opinions of mankind requires that they should declare \
+the causes which impel them to the separation.''',
+}
+print table_1
 
-save = encrypt_with_stretching("password", data)
-print save
+save = encrypt_with_stretching("password", table_1)
+print json.dumps(save, indent=4)
 
-load = decrypt_with_stretching("password", save)
-print load
+table_2 = decrypt_with_stretching("password", save['key data'], save['table'])
+print table_2
 
-print load['db'] == data
+print table_2 == table_1

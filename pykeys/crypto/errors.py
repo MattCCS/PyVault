@@ -1,6 +1,6 @@
 """
 This file contains custom exception classes used for
-differentiating expected and unexpected exceptions.
+differentiating expected and unexpected cryptographic exceptions.
 """
 
 ####################################

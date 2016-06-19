@@ -1,13 +1,21 @@
+"""
+PyKeys API functions.
+"""
 
-def load(): raise NotImplementedError()
-def save(): raise NotImplementedError()
+# package
+from pykeys import pwm
 
-def decrypt(): raise NotImplementedError()
-def encrypt(): raise NotImplementedError()
+__all__ = [
+    pwm.PWM.load,
+    pwm.PWM.save,
 
-def check_master_password(): raise NotImplementedError()
+    pwm.PWM.encrypt,
+    pwm.PWM.decrypt,
 
-def show_entry(): raise NotImplementedError()
-def add_entry(): raise NotImplementedError()
-def edit_entry(): raise NotImplementedError()
-def delete_entry(): raise NotImplementedError()
+    pwm.PWM.check_master_password,
+
+    pwm.PWM.show_entry,
+    pwm.PWM.add_entry,
+    pwm.PWM.edit_entry,
+    pwm.PWM.delete_entry,
+]
