@@ -72,7 +72,7 @@ def encrypt(aes_key, aes_iv, plaintext):
         return encryptor.update(plaintext) + encryptor.finalize()
 
     except ValueError as err:
-        raise errors.SymmetricEncryptionException(err)
+        raise errors.SymmetricEncryptionError(err)
 
 
 def decrypt(aes_key, aes_iv, ciphertext):
@@ -93,4 +93,4 @@ def decrypt(aes_key, aes_iv, ciphertext):
         return decryptor.update(ciphertext)
 
     except ValueError as err:
-        raise errors.SymmetricEncryptionException(err)
+        raise errors.SymmetricEncryptionError(err)

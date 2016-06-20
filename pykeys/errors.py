@@ -7,9 +7,11 @@ differentiating expected and unexpected cryptographic exceptions.
 
 # file errors
 # class PasswordDatabaseNotFound (Exception): pass
-class PasswordDatabaseNotJSON (Exception): pass
-class PasswordDatabasePermission (Exception): pass
+class PasswordFileNotJSON (Exception): pass
+class PasswordFilePermission (Exception): pass
 
 # state errors
-class PasswordDatabaseNotLoaded (Exception): pass
+class PasswordFileNotLoaded (Exception): pass
+class PasswordFileAlreadyLoaded (Exception): pass
+class PasswordTableNotDecrypted (Exception): pass
 class PasswordTableAlreadyDecrypted (Exception): pass
