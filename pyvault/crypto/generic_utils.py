@@ -5,7 +5,7 @@
 import os
 
 # custom
-from pykeys.crypto import settings
+from pyvault.crypto import settings
 
 
 def nonce(n=settings.NONCE_BYTES):

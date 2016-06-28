@@ -1,16 +1,16 @@
 """
-Secure password manager, version 5.
+PyVault:  the secure password manager.  Version 5.
 """
 
 # standard
 import Tkinter as Tk
 
 # project
-from pykeys import constants
-from pykeys import shared
-from pykeys.pages import add_page
-from pykeys.pages import login_page
-from pykeys.pages import main_page
+from pyvault import constants
+from pyvault import shared
+from pyvault.pages import add_page
+from pyvault.pages import login_page
+from pyvault.pages import main_page
 
 
 def setup():

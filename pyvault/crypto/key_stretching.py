@@ -3,7 +3,7 @@
 import hashlib
 
 # custom
-from pykeys.crypto import settings
+from pyvault.crypto import settings
 
 
 def stretch(key, salt, mode=settings.DEFAULT_HASH_MODE, iterations=settings.DEFAULT_ITERATIONS, length=settings.DERIVED_BYTES):

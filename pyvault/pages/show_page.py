@@ -3,8 +3,8 @@
 import Tkinter as Tk
 
 # project
-from pykeys import constants
-from pykeys.pages import page
+from pyvault import constants
+from pyvault.pages import page
 
 class ShowEntry(page.AbstractPage):
 

@@ -3,16 +3,11 @@
 import json
 
 # custom
-from pykeys.crypto import errors
-from pykeys.crypto import generic_utils
-from pykeys.crypto import key_stretching
-from pykeys.crypto import packing_utils
-from pykeys.crypto import symmetric_encryption_utils
-
-
-# def confirm_master_password(memkey, salt, master_key_hash):
-#     return key_stretching.stretch(memkey, salt, )
-
+from pyvault import errors
+from pyvault.crypto import generic_utils
+from pyvault.crypto import key_stretching
+from pyvault.crypto import packing_utils
+from pyvault.crypto import symmetric_encryption_utils
 
 
 def encrypt_with_stretching(memkey, table):
@@ -43,28 +38,35 @@ def encrypt_with_stretching(memkey, table):
 
 def decrypt_with_stretching(memkey, key_data, p_table_encrypted):
     # unpack the data
-    # master_key_hash = packing_utils.unpack(key_data['hash'])
+    master_key_hash = packing_utils.unpack(key_data['hash'])
     salt = packing_utils.unpack(key_data['salt'])
     mode = key_data['mode']
     iterations = key_data['iterations']
     length = key_data['length']
 
     # derive master password (with nonce)
+    print "Stretching password..."
     (master_key_2, _) = key_stretching.stretch(memkey, salt, mode=mode, iterations=iterations, length=length)
 
-    # # stretch again to confirm
-    # (master_key_hash_2, _) = key_stretching.stretch(master_key_2, salt, mode=mode, iterations=iterations, length=length)
-    # if master_key_hash != master_key_hash_2:
-    #     raise errors.PasswordHashComparisonError("Master password was incorrect!")
+    # stretch again to confirm
+    print "Confirming password..."
+    (master_key_hash_2, _) = key_stretching.stretch(master_key_2, salt, mode=mode, iterations=iterations, length=length)
+    if master_key_hash != master_key_hash_2:
+        raise errors.PasswordHashComparisonError("Master password was incorrect!")
 
     # decrypt the database
+    print "Decrypting..."
     ciphertext_data = packing_utils.unpack(p_table_encrypted)
     table = json.loads(symmetric_encryption_utils.decrypt_hmac(master_key_2, ciphertext_data))
     return table
 
+
 if __name__ == '__main__':
     table_1 = {
         'abc': 123,
+        'name': 'Matt',
+        'favorite number': 7,
+        'colors': ['red', 'green', 'blue'],
         'big_data': '''When in the Course of human events, it becomes necessary \
     for one people to dissolve the political bands which have connected them with \
     another, and to assume among the powers of the earth, the separate and equal \

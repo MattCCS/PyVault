@@ -1,9 +1,9 @@
 """
-PyKeys API functions.
+PyVault API functions.
 """
 
 # package
-from pykeys import pwm
+from pyvault import pwm
 
 __all__ = [
     pwm.PWM.load,
@@ -15,7 +15,7 @@ __all__ = [
     pwm.PWM.check_master_password,
 
     pwm.PWM.show_entry,
-    pwm.PWM.add_entry,
+    # pwm.PWM.add_entry,
     pwm.PWM.edit_entry,
     pwm.PWM.delete_entry,
 ]

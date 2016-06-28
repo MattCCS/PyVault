@@ -7,9 +7,9 @@ import Tkinter as Tk
 # import ttk as Tk
 
 # project
-from pykeys import constants
-from pykeys import shared
-from pykeys.pages import page
+from pyvault import constants
+from pyvault import shared
+from pyvault.pages import page
 
 
 class LoginPage(page.AbstractPage):

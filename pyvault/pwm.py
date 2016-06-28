@@ -3,44 +3,45 @@
 
 # standard
 import json
-import functools
 
 # package
-from pykeys import errors
-from pykeys import settings
-from pykeys.db import utils
-from pykeys.crypto import packing_utils
-from pykeys.crypto import key_stretching
-
-
-# decorators
-def decorator_factory(requirement_func, error_arg):
-    def generic_decorator(func):
-        @functools.wraps(func)
-        def _decorator(self, *args, **kwargs):
-            if not requirement_func(self):
-                raise error_arg()
-            return func(self, *args, **kwargs)
-        return _decorator
-    return generic_decorator
-
-requires_file_not_loaded = decorator_factory(lambda self: not self.table, errors.PasswordFileAlreadyLoaded)
-requires_file_loaded = decorator_factory(lambda self: self.table, errors.PasswordFileNotLoaded)
-requires_table_encrypted = decorator_factory(lambda self: not isinstance(self.table, dict), errors.PasswordTableAlreadyDecrypted)
-requires_table_decrypted = decorator_factory(lambda self: isinstance(self.table, dict), errors.PasswordTableNotDecrypted)
+from pyvault import errors
+from pyvault import settings
+from pyvault.db import utils
+from pyvault.crypto import packing_utils
+from pyvault.crypto import key_stretching
 
 
 class PasswordManager(object):
-    """Singleton class that acts as the PyKeys API."""
+    """Singleton class that acts as the PyVault API."""
 
     def __init__(self):
         self.key_data = None
         self.table = None
 
+    def check_file_not_loaded(self):
+        if self.table:
+            raise errors.PasswordFileAlreadyLoaded()
+
+    def check_file_loaded(self):
+        if not self.table:
+            raise errors.PasswordFileNotLoaded()
+
+    def check_table_encrypted(self):
+        if isinstance(self.table, dict):
+            raise errors.PasswordTableAlreadyDecrypted()
+
+    def check_table_decrypted(self):
+        if not isinstance(self.table, dict):
+            raise errors.PasswordTableNotDecrypted()
+
+    ####################################################
+
     # file methods
-    @requires_file_not_loaded
     def load(self):
         """Load password table from disk."""
+        self.check_file_not_loaded()
+
         try:
             with open(settings.DB_PATH) as db_file:
                 db_json = db_file.read()
@@ -55,26 +56,31 @@ class PasswordManager(object):
         except ValueError:
             raise errors.PasswordFileNotJSON()
 
-    @requires_file_loaded
     def save(self):
         """Save password table to disk."""
+        self.check_file_loaded()
+
         raise NotImplementedError()
 
     # database methods
-    @requires_file_loaded
-    @requires_table_encrypted
     def decrypt(self, memkey):
+        self.check_file_loaded()
+        self.check_table_encrypted()
+
         # decrypt table (errors are handled implicitly)
         self.table = utils.decrypt_with_stretching(memkey, self.key_data, self.table)
         return self.table
 
-    @requires_file_loaded
-    @requires_table_decrypted
-    def encrypt(self): raise NotImplementedError()
+    def encrypt(self):
+        self.check_file_loaded()
+        self.check_table_encrypted()
+
+        raise NotImplementedError()
 
     # utility methods
-    @requires_file_loaded
     def check_master_password(self, memkey):
+        self.check_file_loaded()
+
         master_key_hash = packing_utils.unpack(self.key_data['hash'])
         salt = packing_utils.unpack(self.key_data['salt'])
         mode = self.key_data['mode']
@@ -89,9 +95,19 @@ class PasswordManager(object):
         return master_key_hash == master_key_hash_2
 
     # entry methods
+    def check_service_account_pair(self, service, account):
+        raise NotImplementedError()
+
+    def add_encrypted_entry(self, memkey, service, account, password, notes=''):
+        pass
+
+    def add_derived_entry(self, service, account, notes=''):
+        raise NotImplementedError()
+
     def show_entry(self): raise NotImplementedError()
-    def add_entry(self): raise NotImplementedError()
+
     def edit_entry(self): raise NotImplementedError()
+
     def delete_entry(self): raise NotImplementedError()
 
 

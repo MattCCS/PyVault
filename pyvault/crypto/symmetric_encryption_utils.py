@@ -7,11 +7,11 @@ Author:  Matthew Cotton
 """
 
 # custom
-from pykeys.crypto import errors
-from pykeys.crypto import settings
-from pykeys.crypto import generic_utils
-from pykeys.crypto import integrity_utils
-from pykeys.crypto import packing_utils
+from pyvault.crypto import errors
+from pyvault.crypto import settings
+from pyvault.crypto import generic_utils
+from pyvault.crypto import integrity_utils
+from pyvault.crypto import packing_utils
 
 # installed
 from cryptography.hazmat.backends import default_backend

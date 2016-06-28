@@ -7,7 +7,7 @@ import Tkinter as Tk
 # import ttk as Tk
 
 # project
-from pykeys import constants
+from pyvault import constants
 
 # data
 PAGES = {}

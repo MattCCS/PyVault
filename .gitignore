@@ -2,6 +2,8 @@
 *.pyc
 *.gif
 
+venv.txt
+
 .Python
 /bin/
 /include/

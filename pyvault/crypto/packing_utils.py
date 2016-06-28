@@ -3,7 +3,7 @@
 import base64
 
 # custom
-from pykeys.crypto import constants
+from pyvault.crypto import constants
 
 ####################################
 

@@ -4,9 +4,9 @@ import abc
 import base64
 
 # custom
-from pykeys.utils import passwords
-from pykeys.crypto import key_stretching
-from pykeys.crypto import symmetric_encryption_utils
+from pyvault.utils import passwords
+from pyvault.crypto import key_stretching
+from pyvault.crypto import symmetric_encryption_utils
 
 
 class Saveable(object):

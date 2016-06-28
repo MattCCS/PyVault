@@ -8,10 +8,10 @@ import os
 import Tkinter as Tk
 
 # project
-from pykeys import constants
-from pykeys.utils import copy_paste
-from pykeys.utils import passwords
-from pykeys.pages import page
+from pyvault import constants
+from pyvault.utils import copy_paste
+from pyvault.utils import passwords
+from pyvault.pages import page
 
 def set_readonly_label(entry, text):
     entry.configure(state="normal")

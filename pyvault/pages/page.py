@@ -7,7 +7,7 @@ import abc
 import Tkinter as Tk
 
 # project
-from pykeys import shared
+from pyvault import shared
 
 
 class AbstractPage(object):
