@@ -1,0 +1,1 @@
+pyinstaller --onefile -p ... pyvault/pwm.py

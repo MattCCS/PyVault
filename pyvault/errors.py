@@ -11,7 +11,10 @@ class PasswordFileNotJSON (Exception): pass
 class PasswordFilePermission (Exception): pass
 
 # state errors
-class PasswordFileNotLoaded (Exception): pass
-class PasswordFileAlreadyLoaded (Exception): pass
-class PasswordTableNotDecrypted (Exception): pass
-class PasswordTableAlreadyDecrypted (Exception): pass
+class PasswordFileNotOnDisk (Exception): pass
+class PasswordFileNotLocked (Exception): pass
+class PasswordFileNotOpen (Exception): pass
+
+class MasterPasswordIncorrect (Exception): pass
+
+class ServiceAccountPairAlreadyExists (Exception): pass

@@ -3,19 +3,21 @@ PyVault API functions.
 """
 
 # package
-from pyvault import pwm
+from pyvault.pwm import PWM
+from pyvault.db.key_manager import KEYMAN
 
 __all__ = [
-    pwm.PWM.load,
-    pwm.PWM.save,
+    PWM.load,
+    PWM.save,
 
-    pwm.PWM.encrypt,
-    pwm.PWM.decrypt,
+    KEYMAN.decrypt,
+    KEYMAN.encrypt,
 
-    pwm.PWM.check_master_password,
+    KEYMAN.derive_master_password,
 
-    pwm.PWM.show_entry,
-    # pwm.PWM.add_entry,
-    pwm.PWM.edit_entry,
-    pwm.PWM.delete_entry,
+    PWM.add_derived_entry,
+    PWM.add_encrypted_entry,
+    PWM.show_entry,
+    PWM.edit_entry,
+    PWM.delete_entry,
 ]

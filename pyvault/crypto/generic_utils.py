@@ -5,12 +5,12 @@
 import os
 
 # custom
-from pyvault.crypto import settings
+from pyvault.crypto import crypto_settings
 
 
-def nonce(n=settings.NONCE_BYTES):
+def nonce(n=crypto_settings.NONCE_BYTES):
     return os.urandom(n)
 
 
-def iv(n=settings.AES_IV_BYTES):
+def iv(n=crypto_settings.AES_IV_BYTES):
     return nonce(n)

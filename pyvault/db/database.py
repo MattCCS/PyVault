@@ -1,175 +1,117 @@
-
-# standard
-import abc
-import base64
+"""
+"""
 
 # custom
-from pyvault.utils import passwords
-from pyvault.crypto import key_stretching
-from pyvault.crypto import symmetric_encryption_utils
+from pyvault import errors
+from pyvault.db import entry
+from pyvault.db import saveable
+from pyvault.db import utils
+from pyvault.db.key_manager import KEYMAN
 
 
-class Saveable(object):
-    __metaclass__ = abc.ABCMeta
+class Table(saveable.Saveable):
+    """
+    """
 
-    @abc.abstractmethod
-    def save(self):
-        pass
+    ON_DISK = 0
+    LOCKED = 1
+    OPEN = 2
 
-########################################
+    def __init__(self):
+        self.state = Table.ON_DISK
+        self.encrypted_table = None
+        self.entries = None
+        self.namepairs = None
 
+    def _assert_on_disk(self):
+        if self.state != Table.ON_DISK:
+            raise errors.PasswordFileNotOnDisk()
 
-class Database(Saveable):
+    def _assert_locked(self):
+        if self.state != Table.LOCKED:
+            raise errors.PasswordFileNotLocked()
 
-    def __init__(self, data):
-        self.entries = [Entry.new(d) for d in data['entries']]
+    def _assert_open(self):
+        if self.state != Table.OPEN:
+            raise errors.PasswordFileNotOpen()
 
-    def save(self):
-        return {
-            'entries': [entry.save() for entry in self.entries]
-        }
+    def _assert_not_service_account_pair(self, service, account):
+        if self.service_account_pair_exists(service, account):
+            raise errors.ServiceAccountPairAlreadyExists()
 
-########################################
+    ####################################
+    # ON_DISK state methods
 
+    def load(self, encrypted_table):
+        """
+        ON_DISK -> LOCKED
+        """
+        self._assert_on_disk()
+        self.encrypted_table = encrypted_table
+        self.state = Table.LOCKED
 
-class Entry(Saveable):
-
-    __metaclass__ = abc.ABCMeta
-
-    def __init__(self, data):
-        self.service = data['service']
-        self.account = data['account']
-        self.notes = data['notes']
-        self.date_created = data['date_created']
-        self.date_modified = data['date_modified']
-
-    @staticmethod
-    def new(data):
-        if 'p_encrypted_password' in data:
-            return EncryptedEntry(data)
-        elif 'derived_password_parameters' in data:
-            return DerivedEntry(data)
-        else:
-            raise RuntimeError()
-
-    def save(self):
-        return {
-            'service': self.service,
-            'account': self.account,
-            'notes': self.notes,
-            'date_created': self.date_created,
-            'date_modified': self.date_modified,
-        }
-
-
-class EncryptedEntry(Entry):
-
-    def __init__(self, data):
-        Entry.__init__(self, data)
-        self.p_encrypted_password = base64.b64decode(data['p_encrypted_password'])
+    ####################################
+    # LOCKED state methods
 
     def save(self):
-        out = {
-            'p_encrypted_password': base64.b64encode(self.p_encrypted_password),
-        }
-        out.update(Entry.save(self))
-        return out
+        """
+        LOCKED -> ON_DISK
+        """
+        self._assert_locked()
+        raise NotImplementedError()
+        self.state = Table.ON_DISK
+        # return {
+        #     'entries': [entry.save() for entry in self.entries]
+        # }
 
     def decrypt(self, memkey):
+        """
+        LOCKED -> OPEN
+        """
+        self._assert_locked()
 
-        # return symmetric_encryption_utils.decrypt_hmac(, self.p_encrypted_password)
-        pass
+        # decrypt table (errors are handled implicitly)
+        decrypted_table = utils.decrypt_with_stretching(memkey, KEYMAN.get_key_data(), self.encrypted_table)
 
+        # move to OPEN state
+        self.encrypted_table = None
+        self.state = Table.OPEN
 
-class DerivedEntry(Entry):
+        # load entries
+        for entry_data in decrypted_table['entries']:
+            entry_ = entry.Entry(entry_data)
+            self._add_entry(entry_)
 
-    def __init__(self, data):
-        Entry.__init__(self, data)
-        passdata = data['derived_password_data']
-        self.mode = passdata['mode']
-        self.salt = base64.b64decode(passdata['salt'])
-        self.iterations = passdata['iterations']
-        self.length = passdata['length']
+    ####################################
+    # OPEN state methods
 
-        passparams = data['derived_password_parameters']
-        self.uppercase = passparams['uppercase']
-        self.lowercase = passparams['lowercase']
-        self.digits = passparams['digits']
-        self.punctuation = passparams['punctuation']
-        self.custom = passparams['custom']
-        self.all = passparams['all']
+    def encrypt(self, memkey):
+        """
+        OPEN -> LOCKED
+        """
+        self._assert_open()
+        raise NotImplementedError()
+        self.state = Table.LOCKED
 
-    def save(self):
-        out = {
-            'derived_password_parameters': {
-                'uppercase': self.uppercase,
-                'lowercase': self.lowercase,
-                'digits': self.digits,
-                'punctuation': self.punctuation,
-                'custom': self.custom,
-                'all': self.all,
-            },
-            'derived_password_data': {
-                'mode': self.mode,
-                'salt': base64.b64encode(self.salt),
-                'iterations': self.iterations,
-                'length': self.length,
-            },
-        }
-        out.update(Entry.save(self))
-        return out
+    def service_account_pair_exists(self, service, account):
+        self._assert_open()
+        return (service.lower(), account.lower()) in self.namepairs
 
-    def _derive(self, memkey):
-        return key_stretching.stretch(
-            memkey,
-            self.salt,
-            mode=self.mode,
-            iterations=self.iterations,
-            length=self.length,
-        )
+    def _add_entry(self, entry):
+        """Adds a completed entry."""
+        self._assert_open()
+        self._assert_not_service_account_pair(entry.service, entry.account)
 
-    def derive(self, memkey):
-        (key, _) = self._derive(memkey)
-        if self.all:
-            chars = passwords.ALL
-        else:
-            chars = passwords.password_chars(
-                upper=self.uppercase,
-                lower=self.lowercase,
-                digits=self.digits,
-                punctuation=self.punctuation,
-                custom=frozenset(self.custom),
-            )
+        # update entries and namepairs
+        self.entries.append(entry)
+        self.namepairs.add((entry.service.lower(), entry.account.lower()))
 
-        return passwords.remap_bytearray(bytearray(key), chars)
+    def add_encrypted_entry(self, memkey, service, account, password, notes=''):
+        self._assert_open()
+        self._assert_not_service_account_pair(service, account)
 
-TEST_ENCRYPTED = {
+        # create entry
+        entry_ = entry.EncryptedEntry.new(memkey, service, account, password, notes=notes)
+        self._add_entry(entry_)
 
-}
-
-TEST_DERIVED = {
-    'service': 'Yahoo',
-    'account': 'bob',
-    'notes': 'for yahoo answers exclusively',
-    'date_created': 1463005763,
-    'date_modified': 1463005829,
-    'derived_password_data': {
-        'salt': '6FwbKr//dLNP+Iah3bO5XA==',
-        'mode': 'sha256',
-        'iterations': 100000,
-        'length': 12,
-    },
-    'derived_password_parameters': {
-        'uppercase': True,
-        'lowercase': True,
-        'digits': True,
-        'punctuation': False,
-        'custom': '',
-        'all': False,
-    }
-}
-
-d = Entry.new(TEST_DERIVED)
-print d
-print d.derive('secret')
-print d.save() == TEST_DERIVED
+TABLE = Table()

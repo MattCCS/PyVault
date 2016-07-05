@@ -5,6 +5,8 @@ This file contains project constants whose values never change.
 # standard
 import Tkinter as Tk
 
+#######################################
+# Tkinter constants
 START_WIDTH = 600
 START_HEIGHT = 530
 
@@ -21,3 +23,6 @@ HIDDEN = u"\u2022"
 MAIN = "main"
 LOGIN = "login"
 ADD = "add"
+
+#######################################
+# ...

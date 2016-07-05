@@ -7,7 +7,13 @@ from pyvault import errors
 from pyvault.crypto import generic_utils
 from pyvault.crypto import key_stretching
 from pyvault.crypto import packing_utils
-from pyvault.crypto import symmetric_encryption_utils
+from pyvault.crypto import encryption_utils
+
+
+def compare_hash_and_key(target, key, salt, mode, iterations, length):
+    (target_2, _) = key_stretching.stretch(key, salt, mode=mode, iterations=iterations, length=length)
+    if target != target_2:
+        raise errors.MasterPasswordIncorrect("Master password was incorrect!")
 
 
 def encrypt_with_stretching(memkey, table):
@@ -19,7 +25,7 @@ def encrypt_with_stretching(memkey, table):
     (master_key_hash, _) = key_stretching.stretch(master_key, salt)
 
     # dump data, encrypt and HMAC
-    table_encrypted = symmetric_encryption_utils.encrypt_hmac(master_key, json.dumps(table))
+    table_encrypted = encryption_utils.encrypt(master_key, table)
     p_table_encrypted = packing_utils.pack(table_encrypted)
 
     db_encrypted = {
@@ -50,29 +56,40 @@ def decrypt_with_stretching(memkey, key_data, p_table_encrypted):
 
     # stretch again to confirm
     print "Confirming password..."
-    (master_key_hash_2, _) = key_stretching.stretch(master_key_2, salt, mode=mode, iterations=iterations, length=length)
-    if master_key_hash != master_key_hash_2:
-        raise errors.PasswordHashComparisonError("Master password was incorrect!")
+    compare_hash_and_key(master_key_hash, master_key_2, salt, mode, iterations, length)
 
     # decrypt the database
     print "Decrypting..."
     ciphertext_data = packing_utils.unpack(p_table_encrypted)
-    table = json.loads(symmetric_encryption_utils.decrypt_hmac(master_key_2, ciphertext_data))
+    table = encryption_utils.decrypt(master_key_2, ciphertext_data)
     return table
 
 
 if __name__ == '__main__':
     table_1 = {
-        'abc': 123,
-        'name': 'Matt',
-        'favorite number': 7,
-        'colors': ['red', 'green', 'blue'],
-        'big_data': '''When in the Course of human events, it becomes necessary \
-    for one people to dissolve the political bands which have connected them with \
-    another, and to assume among the powers of the earth, the separate and equal \
-    station to which the Laws of Nature and of Nature's God entitle them, a \
-    decent respect to the opinions of mankind requires that they should declare \
-    the causes which impel them to the separation.''',
+        'entries': [
+            {
+                'service': 'Yahoo',
+                'account': 'bob',
+                'notes': 'for yahoo answers exclusively',
+                'date_created': 1463005763,
+                'date_modified': 1463005829,
+                'derived_password_data': {
+                    'salt': '6FwbKr//dLNP+Iah3bO5XA==',
+                    'mode': 'sha256',
+                    'iterations': 100000,
+                    'length': 12,
+                },
+                'derived_password_parameters': {
+                    'uppercase': True,
+                    'lowercase': True,
+                    'digits': True,
+                    'punctuation': False,
+                    'custom': '',
+                    'all': False,
+                }
+            }
+        ],
     }
     print table_1
 

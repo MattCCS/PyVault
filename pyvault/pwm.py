@@ -8,40 +8,17 @@ import json
 from pyvault import errors
 from pyvault import settings
 from pyvault.db import utils
-from pyvault.crypto import packing_utils
-from pyvault.crypto import key_stretching
+from pyvault.db.database import TABLE
+from pyvault.db.key_manager import KEYMAN
+from pyvault.crypto import encryption_utils
 
 
 class PasswordManager(object):
     """Singleton class that acts as the PyVault API."""
 
-    def __init__(self):
-        self.key_data = None
-        self.table = None
-
-    def check_file_not_loaded(self):
-        if self.table:
-            raise errors.PasswordFileAlreadyLoaded()
-
-    def check_file_loaded(self):
-        if not self.table:
-            raise errors.PasswordFileNotLoaded()
-
-    def check_table_encrypted(self):
-        if isinstance(self.table, dict):
-            raise errors.PasswordTableAlreadyDecrypted()
-
-    def check_table_decrypted(self):
-        if not isinstance(self.table, dict):
-            raise errors.PasswordTableNotDecrypted()
-
-    ####################################################
-
     # file methods
     def load(self):
         """Load password table from disk."""
-        self.check_file_not_loaded()
-
         try:
             with open(settings.DB_PATH) as db_file:
                 db_json = db_file.read()
@@ -51,55 +28,39 @@ class PasswordManager(object):
 
         try:
             db = json.loads(db_json)
-            self.key_data = db['key data']
-            self.table = db['table']
         except ValueError:
             raise errors.PasswordFileNotJSON()
+
+        # load to modules
+        KEYMAN.load(db['key data'])
+        TABLE.load(db['table'])
 
     def save(self):
         """Save password table to disk."""
         self.check_file_loaded()
-
         raise NotImplementedError()
 
-    # database methods
-    def decrypt(self, memkey):
+
+    def encrypt_data(self, memkey, *data):
         self.check_file_loaded()
-        self.check_table_encrypted()
-
-        # decrypt table (errors are handled implicitly)
-        self.table = utils.decrypt_with_stretching(memkey, self.key_data, self.table)
-        return self.table
-
-    def encrypt(self):
-        self.check_file_loaded()
-        self.check_table_encrypted()
-
-        raise NotImplementedError()
-
-    # utility methods
-    def check_master_password(self, memkey):
-        self.check_file_loaded()
-
-        master_key_hash = packing_utils.unpack(self.key_data['hash'])
-        salt = packing_utils.unpack(self.key_data['salt'])
-        mode = self.key_data['mode']
-        iterations = self.key_data['iterations']
-        length = self.key_data['length']
-
-        # derive master password (with nonce)
-        (master_key, _) = key_stretching.stretch(memkey, salt, mode=mode, iterations=iterations, length=length)
-
-        # stretch again to confirm
-        (master_key_hash_2, _) = key_stretching.stretch(master_key, salt, mode=mode, iterations=iterations, length=length)
-        return master_key_hash == master_key_hash_2
+        master_key = self.derive_master_password(memkey)
+        return (encryption_utils.encrypt(master_key, datum) for datum in data)
 
     # entry methods
     def check_service_account_pair(self, service, account):
-        raise NotImplementedError()
+        self.check_table_decrypted()
+        return self.table.check_service_account_pair(service, account)
 
     def add_encrypted_entry(self, memkey, service, account, password, notes=''):
-        pass
+        # self.check_table_decrypted()
+
+        # # encrypt password
+        # (e_password, e_notes) = self.encrypt(memkey, password, notes)
+
+        # # create entry
+        # self.table.add_entry(service, account, e_password, e_notes)
+
+        raise NotImplementedError()
 
     def add_derived_entry(self, service, account, notes=''):
         raise NotImplementedError()

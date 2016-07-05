@@ -3,10 +3,10 @@
 import hashlib
 
 # custom
-from pyvault.crypto import settings
+from pyvault.crypto import crypto_settings
 
 
-def stretch(key, salt, mode=settings.DEFAULT_HASH_MODE, iterations=settings.DEFAULT_ITERATIONS, length=settings.DERIVED_BYTES):
+def stretch(key, salt, mode=crypto_settings.DEFAULT_HASH_MODE, iterations=crypto_settings.DEFAULT_ITERATIONS, length=crypto_settings.DERIVED_BYTES):
     """
     Returns:
     1) derived key, and

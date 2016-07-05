@@ -1,0 +1,8 @@
+#!/bin/bash
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd ) # directory of this script
+cd $DIR/..
+
+# python -B -i -m pyvault.db.utils
+python -B -i -m pyvault.pwm
+# python -B -m pyvault.main

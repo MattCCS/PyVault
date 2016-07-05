@@ -27,18 +27,20 @@ class LoginPage(page.AbstractPage):
         self.login_frame = Tk.Frame(self.main)
         self.login_frame.pack(expand="yes")
 
-        self._lock = Tk.PhotoImage(file="icons/lock-128.gif")
+        self._lock = Tk.PhotoImage(file="icons/PyVault Logo.gif")
         _border = 0
         _canv = Tk.Canvas(
             self.login_frame,
-            width=128 - 36,
-            height=128,
+            width=200,
+            height=164,
             borderwidth=_border,
             relief="raised"
         )
         _canv.pack()
-        _dim = 64 + 3 + _border
-        _canv.create_image(_dim - 36 / 2, _dim, image=self._lock)
+
+        _x = 3
+        _y = 3
+        _canv.create_image(200/2 + _x + _border, 164/2 + _y + _border, image=self._lock)
 
         _expln = Tk.StringVar()
         _expln.set("The password table is encrypted.\nTo decrypt it, please enter the master password below.")
