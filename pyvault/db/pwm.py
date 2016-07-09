@@ -7,7 +7,7 @@ import json
 # package
 from pyvault import errors
 from pyvault import settings
-from pyvault.db import utils
+# from pyvault.db import utils
 from pyvault.db.database import TABLE
 from pyvault.db.key_manager import KEYMAN
 from pyvault.crypto import encryption_utils

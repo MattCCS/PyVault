@@ -9,7 +9,7 @@ import base64
 from pyvault.crypto import datetime_utils
 from pyvault.crypto import encryption_utils
 from pyvault.crypto import key_stretching
-from pyvault.crypto import packing_utils
+# from pyvault.crypto import packing_utils
 from pyvault.db import saveable
 from pyvault.db.key_manager import KEYMAN
 from pyvault.utils import passwords

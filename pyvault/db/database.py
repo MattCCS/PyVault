@@ -75,6 +75,8 @@ class Table(saveable.Saveable):
 
         # move to OPEN state
         self.encrypted_table = None
+        self.entries = []
+        self.namepairs = set()
         self.state = Table.OPEN
 
         # load entries
