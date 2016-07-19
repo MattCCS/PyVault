@@ -5,7 +5,8 @@ import functools
 import getpass
 
 # package
-from pyvault import *
+import pyvault
+# print dir(pyvault)
 from pyvault import errors
 
 #######################################
@@ -20,14 +21,18 @@ Main Menu
 2) Add derived entry
 3) Check for service/account pair"""
 
+CLEAR = "\n" * 24
+
 
 def prompt_for(prompt, values, error="[-] Not a valid option.\n"):
     while True:
         inp = raw_input(prompt + "\n>")
+        print CLEAR
         if inp in values:
             return inp
         else:
             print error
+
 
 def control_c_backup(func):
     @functools.wraps(func)
@@ -35,7 +40,7 @@ def control_c_backup(func):
         try:
             return func(*args, **kwargs)
         except KeyboardInterrupt:
-            print
+            print CLEAR
             return
     return wrap
 
@@ -49,7 +54,8 @@ def check_service_account_menu():
         print "\nCheck for Service/Account Pair"
         service = raw_input("Service: ")
         account = raw_input("Account: ")
-        print TABLE.service_account_pair_exists(service, account)
+        print pyvault.service_account_pair_exists(service, account)
+
 
 @control_c_backup
 def main_menu():
@@ -60,31 +66,36 @@ def main_menu():
     }
 
     while True:
-        inp = prompt_for(MAIN_MENU_PROMPT, set('123'))
+        inp = prompt_for(MAIN_MENU_PROMPT, set('3'))
         choices[inp]()
 
     raise NotImplementedError()
+
 
 @control_c_backup
 def unlock_menu():
     # load file
     print "Loading..."
-    PWM.load()
+    pyvault.load()
 
     # unlock table
+    print CLEAR
     while True:
         # prompt for memkey
         memkey = getpass.getpass(UNLOCK_MENU_PROMPT)
         try:
-            TABLE.decrypt(memkey)
+            pyvault.decrypt(memkey)
             print "[+] Success!"
+            print CLEAR
             break
         except errors.MasterPasswordIncorrect:
+            print CLEAR
             print "[-] Password was incorrect."
 
     main_menu()
     raise NotImplementedError()
-    PWM.save()
+    pyvault.save()
+
 
 if __name__ == '__main__':
     unlock_menu()

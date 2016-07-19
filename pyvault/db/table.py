@@ -58,11 +58,13 @@ class Table(saveable.Saveable):
         LOCKED -> ON_DISK
         """
         self._assert_locked()
-        raise NotImplementedError()
+
+        data = self.encrypted_table
+
+        self.encrypted_table = None
         self.state = Table.ON_DISK
-        # return {
-        #     'entries': [entry.save() for entry in self.entries]
-        # }
+
+        return data
 
     def decrypt(self, memkey):
         """

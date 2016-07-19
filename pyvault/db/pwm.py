@@ -8,7 +8,7 @@ import json
 from pyvault import errors
 from pyvault import settings
 # from pyvault.db import utils
-from pyvault.db.database import TABLE
+from pyvault.db.table import TABLE
 from pyvault.db.key_manager import KEYMAN
 from pyvault.crypto import encryption_utils
 
@@ -16,6 +16,7 @@ from pyvault.crypto import encryption_utils
 class PasswordManager(object):
     """Singleton class that acts as the PyVault API."""
 
+    ####################################
     # file methods
     def load(self):
         """Load password table from disk."""
@@ -37,9 +38,23 @@ class PasswordManager(object):
 
     def save(self):
         """Save password table to disk."""
-        self.check_file_loaded()
-        raise NotImplementedError()
+        raise NotImplementedError() # TODO: <<<!!!
+        db = {
+            'key data': KEYMAN.save(),
+            'table': TABLE.save(),
+        }
 
+        db_json = json.dumps(db)
+
+        try:
+            with open(settings.DB_PATH, 'w') as db_file:
+                db_file.write(db_json)
+        except IOError:
+            # TODO: handle other file errors
+            raise errors.PasswordFilePermission()
+
+    ####################################
+    # ...
 
     def encrypt_data(self, memkey, *data):
         self.check_file_loaded()
@@ -51,16 +66,16 @@ class PasswordManager(object):
         self.check_table_decrypted()
         return self.table.check_service_account_pair(service, account)
 
-    def add_encrypted_entry(self, memkey, service, account, password, notes=''):
-        # self.check_table_decrypted()
+    # def add_encrypted_entry(self, memkey, service, account, password, notes=''):
+    #     # self.check_table_decrypted()
 
-        # # encrypt password
-        # (e_password, e_notes) = self.encrypt(memkey, password, notes)
+    #     # # encrypt password
+    #     # (e_password, e_notes) = self.encrypt(memkey, password, notes)
 
-        # # create entry
-        # self.table.add_entry(service, account, e_password, e_notes)
+    #     # # create entry
+    #     # self.table.add_entry(service, account, e_password, e_notes)
 
-        raise NotImplementedError()
+    #     raise NotImplementedError()
 
     def add_derived_entry(self, service, account, notes=''):
         raise NotImplementedError()

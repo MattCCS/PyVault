@@ -3,6 +3,6 @@ PyVault API functions.
 """
 
 # package
-from pyvault.db import *
+from pyvault.api import *
 
-__all__ = ['PWM', 'KEYMAN', 'TABLE']
+__all__ = ["api", "errors"]

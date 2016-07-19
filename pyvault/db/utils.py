@@ -58,7 +58,7 @@ def decrypt_with_stretching(memkey, key_data, p_table_encrypted):
     print "Confirming password..."
     compare_hash_and_key(master_key_hash, master_key_2, salt, mode, iterations, length)
 
-    # decrypt the database
+    # decrypt the table
     print "Decrypting..."
     ciphertext_data = packing_utils.unpack(p_table_encrypted)
     table = encryption_utils.decrypt(master_key_2, ciphertext_data)
