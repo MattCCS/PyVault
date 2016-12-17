@@ -9,3 +9,5 @@ venv.txt
 /include/
 /lib/
 /pip-selfcheck.json
+
+*.log

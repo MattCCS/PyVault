@@ -101,19 +101,12 @@ class DerivedEntry(_AbstractEntry):
 
     def __init__(self, data):
         _AbstractEntry.__init__(self, data)
-        passdata = data['derived_password_data']
-        self.mode = passdata['mode']
-        self.salt = base64.b64decode(passdata['salt'])
-        self.iterations = passdata['iterations']
-        self.length = passdata['length']
-
-        passparams = data['derived_password_parameters']
-        self.uppercase = passparams['uppercase']
-        self.lowercase = passparams['lowercase']
-        self.digits = passparams['digits']
-        self.punctuation = passparams['punctuation']
-        self.custom = passparams['custom']
-        self.all = passparams['all']
+        params = data['derived_password_parameters']
+        self.mode = params['mode']
+        self.salt = base64.b64decode(params['salt'])
+        self.iterations = params['iterations']
+        self.length = params['length']
+        self.characters = params['characters']
 
     @staticmethod
     def new(self):
@@ -123,18 +116,11 @@ class DerivedEntry(_AbstractEntry):
         data = _AbstractEntry.save(self)
         data.update({
             'derived_password_parameters': {
-                'uppercase': self.uppercase,
-                'lowercase': self.lowercase,
-                'digits': self.digits,
-                'punctuation': self.punctuation,
-                'custom': self.custom,
-                'all': self.all,
-            },
-            'derived_password_data': {
                 'mode': self.mode,
                 'salt': base64.b64encode(self.salt),
                 'iterations': self.iterations,
                 'length': self.length,
+                'characters': self.characters,
             },
         })
         return data
@@ -150,18 +136,7 @@ class DerivedEntry(_AbstractEntry):
 
     def derive(self, memkey):
         (key, _) = self._derive(memkey)
-        if self.all:
-            chars = passwords.ALL
-        else:
-            chars = passwords.password_chars(
-                upper=self.uppercase,
-                lower=self.lowercase,
-                digits=self.digits,
-                punctuation=self.punctuation,
-                custom=frozenset(self.custom),
-            )
-
-        return passwords.remap_bytearray(bytearray(key), chars)
+        return passwords.remap_bytearray(bytearray(key), self.characters)
 
 
 if __name__ == '__main__':

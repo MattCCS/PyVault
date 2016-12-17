@@ -6,6 +6,7 @@ This file contains the class which runs the main page.
 import base64
 import os
 import Tkinter as Tk
+import ttk
 
 # project
 from pyvault import constants
@@ -13,11 +14,24 @@ from pyvault.utils import copy_paste
 from pyvault.utils import passwords
 from pyvault.pages import page
 
+
 def set_readonly_label(entry, text):
     entry.configure(state="normal")
     entry.delete(0, 'end')
     entry.insert(0, text)
     entry.configure(state="readonly")
+
+
+def treeview_sort_column(tv, col, reverse):
+    items = [(tv.set(k, col), k) for k in tv.get_children('')]
+    items.sort(reverse=reverse)
+
+    # rearrange items in sorted positions
+    for index, (val, k) in enumerate(items):
+        tv.move(k, '', index)
+
+    # reverse sort next time
+    tv.heading(col, command=lambda: treeview_sort_column(tv, col, not reverse))
 
 
 class MainPage(page.AbstractPage):
@@ -73,8 +87,26 @@ class MainPage(page.AbstractPage):
         self.frame_database.rowconfigure(0, weight=1)
 
         # notes and buttons
-        self.listbox_keys = Tk.Listbox(self.frame_database, relief="ridge", borderwidth=4)
-        self.listbox_keys.grid(row=0, column=0, columnspan=2, rowspan=5, sticky=constants.FILLCELL)
+        columns = (
+            ('Service', 100),
+            ('Account', 150),
+            ('Password', 50),
+        )
+        self.treeview_keys = ttk.Treeview(
+            self.frame_database,
+            columns=[col[0] for col in columns],
+            show='headings',
+            padding=4,
+        )
+        #ysb = ttk.Scrollbar(orient=Tk.VERTICAL, command=self.treeview_keys.yview)
+        #xsb = ttk.Scrollbar(orient=Tk.HORIZONTAL, command=self.treeview_keys.xview)
+        #self.treeview_keys['yscroll'] = ysb.set
+        #self.treeview_keys['xscroll'] = xsb.set
+        for (col, wid) in columns:
+            self.treeview_keys.heading(col, text=col, command=lambda: treeview_sort_column(self.treeview_keys, col, False))
+            self.treeview_keys.column(col, minwidth=50, width=wid)
+        self.treeview_keys.grid(row=0, column=0, columnspan=2, rowspan=5, sticky=constants.FILLCELL)
+        self.treeview_keys.insert('', Tk.END, values=("Yahoo", "example@yahoo.com", '\xe2\x80\xa2'*10))
         self.text_notes = Tk.Text(self.frame_database, width=20, height=10, relief="ridge", borderwidth=4)
         self.text_notes.grid(row=0, column=2, sticky=constants.FILLCELL)
         self.button_show = Tk.Button(self.frame_database, text="Show", command=self.main_to_show)

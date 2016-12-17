@@ -5,4 +5,4 @@ cd $DIR/..
 
 # python -B -i -m pyvault.db.utils
 # python -B -i -m pyvault.pwm
-python -B -m pyvault.main
+python -B -m pyvault.main 1> logs/guistdout.log 2> logs/guistderr.log &
