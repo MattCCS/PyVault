@@ -1,0 +1,30 @@
+PyVault
+
+----------------------------------------
+API (with state transitions):
+
+create_table: -> <file>
+load_table: <file> -> NewTable OR LockedTable (ClosedTable)
+save_table: Table -> <file>
+
+set_password: NewTable -> LockedTable
+reset_password: LockedTable OR UnlockedTable (TableWithPassword) -> ""
+check_password: LockedTable OR UnlockedTable (TableWithPassword) -> ""
+
+decrypt: LockedTable -> UnlockedTable
+encrypt: UnlockedTable -> LockedTable
+
+add_entry: UnlockedTable -> ""
+list_entry: UnlockedTable -> ""
+list_entries: UnlockedTable -> ""
+edit_entry: UnlockedTable -> ""
+delete_entry: UnlockedTable -> ""
+
+----------------------------------------
+Class diagrams:
+
+Table -> ClosedTable -> NewTable, LockedTable
+Table -> TableWithPassword -> LockedTable, UnlockedTable
+
+Entry -> EncryptedEntry, DerivedEntry
+
