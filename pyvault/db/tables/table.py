@@ -7,9 +7,7 @@ from pyvault.db.tables import emptytable
 from pyvault.db.tables import lockedtable
 
 
-class Table(properties.Saveable, properties.Loadable):
-
-    __metaclass__ = abc.ABCMeta
+class Table(abc.ABC, properties.Saveable, properties.Loadable):
 
     def load(table_data):
         if not table_data:

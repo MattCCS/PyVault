@@ -2,19 +2,16 @@
 import abc
 
 
-class Saveable(object):
-
-    __metaclass__ = abc.ABCMeta
+class Saveable(abc.ABC):
 
     @abc.abstractmethod
     def save(self):
         pass
 
 
-class Loadable(object):
+class Loadable(abc.ABC):
 
-    __metaclass__ = abc.ABCMeta
-
-    @abc.abstractstaticmethod
+    @staticmethod
+    @abc.abstractmethod
     def load():
         pass

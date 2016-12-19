@@ -8,9 +8,7 @@ from pyvault.db.entries import encryptedentry
 #from pyvault.db import state
 
 
-class Entry(properties.Saveable, properties.Loadable):
-
-    __metaclass__ = abc.ABCMeta
+class Entry(abc.ABC, properties.Saveable, properties.Loadable):
 
     def load(entry_data):
         if 'password' in entry_data:

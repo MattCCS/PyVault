@@ -5,9 +5,7 @@ from pyvault.db import password
 from pyvault.db.tables import table
 
 
-class TableWithPassword(table.Table):
-
-    __metaclass__ = abc.ABCMeta
+class TableWithPassword(abc.ABC, table.Table):
 
     def __init__(self, keys, passdata):
         self.keys = keys
