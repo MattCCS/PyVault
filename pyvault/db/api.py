@@ -22,7 +22,9 @@ def save_table():
 
 
 def set_password(key):
-    return state.get_table().set_password(key)
+    table = state.get_table().set_password(key)
+    state.set_table(table)
+    return table
 
 
 def reset_password(key, newkey):

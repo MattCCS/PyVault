@@ -7,12 +7,12 @@ from pyvault.db.tables import emptytable
 from pyvault.db.tables import lockedtable
 
 
-class Table(abc.ABC, properties.Saveable, properties.Loadable):
+class Table(abc.ABC, properties.Saveable, properties.Newable, properties.Loadable):
 
     def load(table_data):
         if not table_data:
-            return emptytable.EmptyTable()
-        return lockedtable.LockedTable.load(**table_data)
+            return emptytable.EmptyTable.new()
+        return lockedtable.LockedTable.load(table_data)
 
     def set_password(self, key):
         raise errors.RequiresEmptyTableError()

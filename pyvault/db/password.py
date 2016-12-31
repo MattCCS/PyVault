@@ -6,7 +6,7 @@ from pyvault.db import utils
 from pyvault.db import properties
 
 
-class Password(properties.Saveable, properties.Loadable):
+class Password(properties.Saveable, properties.Loadable, properties.Newable):
 
     @staticmethod
     def load(password_data):

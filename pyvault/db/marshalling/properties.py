@@ -15,3 +15,11 @@ class Loadable(abc.ABC):
     @abc.abstractmethod
     def load():
         pass
+
+
+class Newable(abc.ABC):
+
+    @staticmethod
+    @abc.abstractmethod
+    def new():
+        pass
