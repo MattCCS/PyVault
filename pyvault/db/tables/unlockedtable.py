@@ -24,17 +24,17 @@ class UnlockedTable(table.TableWithPassword):
         master_key = self.password.derive(key)
         self.keys = encryption_utils.encrypt(master_key, self.clearkeys)
 
-    def add_entry(self):
+    def add_entry(self, key, entry):
         raise NotImplementedError()
 
-    def show_entry(self):
+    def show_entry(self, key, id_):
         raise NotImplementedError()
 
-    def list_entries(self):
+    def list_entries(self, query):
         raise NotImplementedError()
 
-    def edit_entry(self):
+    def edit_entry(self, key, id_, newentry):
         raise NotImplementedError()
 
-    def delete_entry(self):
+    def delete_entry(self, key, id_):
         raise NotImplementedError()
