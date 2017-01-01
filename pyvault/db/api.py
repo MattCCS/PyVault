@@ -47,8 +47,8 @@ def add_entry(self, key, entry):
     return state.get_table().add_entry(key, entry)
 
 
-def list_entry(self, id_):
-    return state.get_table().list_entry(id_)
+def show_entry(self, key, id_):
+    return state.get_table().show_entry(key, id_)
 
 
 def list_entries(self, query):

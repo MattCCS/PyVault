@@ -32,7 +32,7 @@ class Table(abc.ABC, properties.Saveable, properties.Newable, properties.Loadabl
     def add_entry(self, key, entry):
         raise errors.RequiresUnlockedTableError()
 
-    def list_entry(self, id_):
+    def show_entry(self, key, id_):
         raise errors.RequiresUnlockedTableError()
 
     def list_entries(self, query):

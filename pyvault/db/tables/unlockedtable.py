@@ -27,7 +27,7 @@ class UnlockedTable(table.TableWithPassword):
     def add_entry(self):
         raise NotImplementedError()
 
-    def list_entry(self):
+    def show_entry(self):
         raise NotImplementedError()
 
     def list_entries(self):
