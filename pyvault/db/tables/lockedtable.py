@@ -22,7 +22,7 @@ class LockedTable(table.TableWithPassword):
         clearkeys = encryption_utils.decrypt(master_key, self.keys)
         return unlockedtable.UnlockedTable.new(self.keys, self.passdata, clearkeys)
 
-    def reencrypt_keys(self, key, newkey):
-        master_key = self.password.derive(key)
-        clearkeys = encryption_utils.decrypt(master_key, self.keys)
-        self.keys = encryption_utils.encrypt(newkey, clearkeys)
+    def reencrypt_keys(self, old_master_key, newkey):
+        new_master_key = self.passdata.derive(newkey)
+        clearkeys = encryption_utils.decrypt(old_master_key, self.keys)
+        self.keys = encryption_utils.encrypt(new_master_key, clearkeys)

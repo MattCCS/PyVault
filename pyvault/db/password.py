@@ -15,9 +15,9 @@ class Password(properties.Saveable, properties.Loadable, properties.Newable):
         return Password(**password_data)
 
     @staticmethod
-    def new(key):
+    def new(master_key):
         salt = generic_utils.nonce()
-        (key_hash, (mode, _, iterations, length)) = key_stretching.stretch(key, salt)
+        (key_hash, (mode, _, iterations, length)) = key_stretching.stretch(master_key, salt)
         return Password(**{
             "key_hash": key_hash,
             "salt": salt,
@@ -34,8 +34,9 @@ class Password(properties.Saveable, properties.Loadable, properties.Newable):
         self.length = length
 
     def reset(self, key, newkey):
-        self.check(key)
-        return Password.new(newkey)
+        old_master_key = self.derive(key)
+        newpass = Password.new(newkey)
+        return (old_master_key, newpass)
 
     def check(self, key):
         """Equivalent to self.derive, but does not return the key."""

@@ -1,4 +1,6 @@
 
+import warnings
+
 from pyvault.crypto import encryption_utils
 from pyvault.db.entries import entry
 from pyvault.db.tables import table
@@ -20,21 +22,35 @@ class UnlockedTable(table.TableWithPassword):
         keys = encryption_utils.encrypt(master_key, self.clearkeys)
         return lockedtable.LockedTable.new(keys, self.passdata)
 
-    def reencrypt_keys(self, key, newkey):
-        master_key = self.password.derive(key)
-        self.keys = encryption_utils.encrypt(master_key, self.clearkeys)
+    def reencrypt_keys(self, old_master_key, newkey):
+        new_master_key = self.passdata.derive(newkey)
+        self.keys = encryption_utils.encrypt(new_master_key, self.clearkeys)
+
+    def update_keys(self, key, newkeys):
+        master_key = self.passdata.derive(key)
+        self.keys = encryption_utils.encrypt(master_key, newkeys)
+        self.clearkeys = newkeys
 
     def add_entry(self, key, entry):
-        raise NotImplementedError()
+        tempkeys = self.clearkeys[:]
+        tempkeys.append(entry)
+        self.update_keys(key, tempkeys)
 
-    def show_entry(self, key, id_):
-        raise NotImplementedError()
+    def show_entry(self, key, index):
+        self.check_password(key)
+        return self.clearkeys[index]
 
     def list_entries(self, query):
-        raise NotImplementedError()
+        # TODO
+        warnings.warn("'query' param will be ignored!")
+        return [clearkey.save() for clearkey in self.clearkeys]
 
-    def edit_entry(self, key, id_, newentry):
-        raise NotImplementedError()
+    def edit_entry(self, key, index, newentry):
+        tempkeys = self.clearkeys[:]
+        tempkeys[index] = newentry
+        self.update_keys(key, tempkeys)
 
-    def delete_entry(self, key, id_):
-        raise NotImplementedError()
+    def delete_entry(self, key, index):
+        tempkeys = self.clearkeys[:]
+        del tempkeys[index]
+        self.update_keys(key, tempkeys)

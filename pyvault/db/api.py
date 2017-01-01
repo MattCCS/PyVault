@@ -47,17 +47,17 @@ def add_entry(self, key, entry):
     return state.get_table().add_entry(key, entry)
 
 
-def show_entry(self, key, id_):
-    return state.get_table().show_entry(key, id_)
+def show_entry(self, key, index):
+    return state.get_table().show_entry(key, index)
 
 
 def list_entries(self, query):
     return state.get_table().list_entries(query)
 
 
-def edit_entry(self, key, id_, newentry):
-    return state.get_table().edit_entry(key, id_, newentry)
+def edit_entry(self, key, index, newentry):
+    return state.get_table().edit_entry(key, index, newentry)
 
 
-def delete_entry(self, key, id_):
-    return state.get_table().delete_entry(key, id_)
+def delete_entry(self, key, index):
+    return state.get_table().delete_entry(key, index)

@@ -25,8 +25,8 @@ class TableWithPassword(abc.ABC, table.Table):
         self.passdata = password.Password.load(passdata)
 
     def reset_password(self, key, newkey):
-        self.passdata = self.passdata.reset(key, newkey)
-        self.reencrypt_keys(key, newkey)
+        (old_master_key, self.passdata) = self.passdata.reset(key, newkey)
+        self.reencrypt_keys(old_master_key, newkey)
 
     def check_password(self, key):
         self.passdata.check(key)
