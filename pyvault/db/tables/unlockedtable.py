@@ -5,6 +5,7 @@ from pyvault.crypto import encryption_utils
 from pyvault.db.entries import entry
 from pyvault.db.tables import table
 from pyvault.db.tables import lockedtable
+from pyvault.db.entries import entry
 
 
 class UnlockedTable(table.TableWithPassword):
@@ -31,8 +32,11 @@ class UnlockedTable(table.TableWithPassword):
         self.keys = encryption_utils.encrypt(master_key, newkeys)
         self.clearkeys = newkeys
 
+    def clone_keys(self):
+        return [entry.Entry.load(clearkey.save()) for clearkey in self.clearkeys]
+
     def add_entry(self, key, entry):
-        tempkeys = self.clearkeys[:]
+        tempkeys = self.clone_keys()
         tempkeys.append(entry)
         self.update_keys(key, tempkeys)
 
@@ -46,11 +50,11 @@ class UnlockedTable(table.TableWithPassword):
         return [clearkey.save() for clearkey in self.clearkeys]
 
     def edit_entry(self, key, index, newentry):
-        tempkeys = self.clearkeys[:]
+        tempkeys = self.clone_keys()
         tempkeys[index] = newentry
         self.update_keys(key, tempkeys)
 
     def delete_entry(self, key, index):
-        tempkeys = self.clearkeys[:]
+        tempkeys = self.clone_keys()
         del tempkeys[index]
         self.update_keys(key, tempkeys)
